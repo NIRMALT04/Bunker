@@ -8,6 +8,15 @@ if (typeof window !== 'undefined') {
   window.mapboxgl = window.mapboxgl || {};
   // @ts-ignore
   window.mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN;
+  
+  // Disable telemetry globally
+  // @ts-ignore
+  window.mapboxgl.config = {
+    // @ts-ignore
+    ...window.mapboxgl.config,
+    REQUEST_TIMEOUT: 0,
+    MAX_PARALLEL_IMAGE_REQUESTS: 0
+  };
 }
 
 // Default map settings

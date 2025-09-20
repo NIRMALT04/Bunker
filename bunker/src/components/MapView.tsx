@@ -32,21 +32,24 @@ const MapView: React.FC<MapViewProps> = ({ center, zoom, layers = [], analysisTy
       // Select map style based on analysis type
       const mapStyle = getMapStyleForAnalysisType(analysisType);
 
-      map.current = new mapboxgl.Map({
-        container: mapContainer.current!,
-        style: mapStyle,
-        center: center,
-        zoom: zoom,
-        attributionControl: false,
-        // Disable telemetry to avoid blocked requests
-        transformRequest: (url, resourceType) => {
-          // Skip analytics requests that might be blocked
-          if (url.includes('events.mapbox.com')) {
-            return null;
-          }
-          return { url };
-        }
-      });
+          map.current = new mapboxgl.Map({
+            container: mapContainer.current!,
+            style: mapStyle,
+            center: center,
+            zoom: zoom,
+            attributionControl: false,
+            // Disable telemetry to avoid blocked requests
+            transformRequest: (url, resourceType) => {
+              // Skip all analytics and telemetry requests
+              if (url.includes('events.mapbox.com') || 
+                  url.includes('api.mapbox.com/events') ||
+                  url.includes('metrics') ||
+                  url.includes('telemetry')) {
+                return null;
+              }
+              return { url };
+            }
+          });
 
       // Handle missing images gracefully
       map.current.on('styleimagemissing', (e) => {
