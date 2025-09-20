@@ -1,0 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body {
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-bunker-accent hover:bg-bunker-accentHover text-white font-semibold transition-colors duration-200;
+  }
+  
+  .input-field {
+    @apply bg-transparent text-bunker-textPrimary flex-grow outline-none placeholder:text-bunker-textSecondary;
+  }
+  
+  .card {
+    @apply bg-bunker-card border border-bunker-border rounded-xl;
+  }
+  
+  .textured-grid {
+    background-image: 
+      radial-gradient(circle at center, #111 0%, #0d0d0d 100%),
+      linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px);
+    background-size: 100% 100%, 20px 20px, 20px 20px;
+    background-position: 0 0, 0 0, 0 0;
+  }
+  
+  .textured-grid-subtle {
+    background-image: 
+      radial-gradient(circle at center, #111 0%, #0d0d0d 100%),
+      linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 100% 100%, 20px 20px, 20px 20px;
+    background-position: 0 0, 0 0, 0 0;
+  }
+}
