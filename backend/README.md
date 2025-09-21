@@ -10,6 +10,8 @@ A minimal backend API for the Bunker spatial intelligence platform, providing ge
 - **Radar Integration**: Access RainViewer radar imagery
 - **AI Analysis**: Generate intelligent summaries using Google Gemini
 - **Location Extraction**: Automatically extract locations from user queries
+- **TerraMind Integration**: Advanced geospatial analysis using IBM's TerraMind AI model
+- **Multimodal Analysis**: Combine satellite imagery with natural language understanding
 
 ## API Endpoints
 
@@ -31,8 +33,17 @@ Analyze spatial data for a given query and location.
   "riskLevel": "low",
   "dataPoints": [...],
   "spatialData": {...},
-  "sources": ["Open-Meteo", "RainViewer", "NOAA"],
-  "metadata": {...}
+  "sources": ["Open-Meteo", "RainViewer", "NOAA", "IBM TerraMind", "ESA Copernicus AI"],
+  "metadata": {
+    "aiModels": ["Google Gemini 1.5 Flash", "IBM TerraMind 1.0 Large"],
+    "multimodalAnalysis": true
+  },
+  "terraMindInsights": {
+    "landUseClassification": {...},
+    "vegetationHealth": {...},
+    "changeDetectionAI": {...},
+    "environmentalAssessment": {...}
+  }
 }
 ```
 

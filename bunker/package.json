@@ -11,13 +11,16 @@
     "demo": "npm run dev"
   },
   "dependencies": {
+    "@mapbox/mapbox-gl-draw": "^1.5.0",
     "@types/mapbox-gl": "^3.4.1",
     "autoprefixer": "^10.4.21",
+    "chart.js": "^4.5.0",
     "framer-motion": "^12.23.16",
     "lucide-react": "^0.544.0",
     "mapbox-gl": "^3.15.0",
     "postcss": "^8.5.6",
     "react": "^19.1.1",
+    "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.1.1",
     "tailwindcss": "^3.4.0"
   },

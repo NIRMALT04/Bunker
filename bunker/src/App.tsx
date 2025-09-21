@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import AskView from './components/AskView';
 import LoadingView from './components/LoadingView';
@@ -11,6 +11,7 @@ type ViewState = 'ask' | 'loading' | 'results';
 interface QueryData {
   query: string;
   coordinates?: { lat: number; lng: number };
+  areaData?: { coordinates: { lat: number; lng: number }[], bounds: any };
 }
 
 function App() {
@@ -19,7 +20,39 @@ function App() {
   const [analysisData, setAnalysisData] = useState<AnalysisResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const handleAnalyze = async (query: string, coordinates?: { lat: number; lng: number }) => {
+  // Global error handler to suppress external script errors
+  useEffect(() => {
+    // Use a more stable approach - only run once and don't modify global objects
+    const handleError = (event: ErrorEvent) => {
+      const message = event.message || '';
+      if (message.includes('speed.js') || 
+          message.includes('playbackRate') || 
+          message.includes('Cannot read properties of null') ||
+          message.includes('Cannot set properties of null')) {
+        event.preventDefault();
+        return false;
+      }
+    };
+
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      const message = event.reason?.message || event.reason || '';
+      if (message.includes('speed.js') || 
+          message.includes('playbackRate')) {
+        event.preventDefault();
+        return false;
+      }
+    };
+
+    window.addEventListener('error', handleError);
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+
+    return () => {
+      window.removeEventListener('error', handleError);
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+    };
+  }, []);
+
+  const handleAnalyze = async (query: string, coordinates?: { lat: number; lng: number }, areaData?: { coordinates: { lat: number; lng: number }[], bounds: any }) => {
     try {
       setError(null);
       setViewState('loading');
@@ -43,13 +76,14 @@ function App() {
       }
 
       // Store query data
-      const data: QueryData = { query, coordinates: finalCoordinates };
+      const data: QueryData = { query, coordinates: finalCoordinates, areaData };
       setQueryData(data);
 
       // Analyze the query
       const analysis = await analyzeQuery({
         query,
-        coordinates: finalCoordinates
+        coordinates: finalCoordinates,
+        areaData
       });
 
       setAnalysisData(analysis);

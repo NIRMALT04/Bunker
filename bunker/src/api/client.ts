@@ -1,7 +1,7 @@
 // Main API client that orchestrates all data services
-import WeatherService from './services/weatherService.js';
-import RadarService from './services/radarService.js';
-import MapboxService from './services/mapboxService.js';
+import WeatherService from './services/weatherService';
+import RadarService from './services/radarService';
+import MapboxService from './services/mapboxService';
 
 class BunkerAPIClient {
   constructor() {

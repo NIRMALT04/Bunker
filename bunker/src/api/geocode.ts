@@ -1,5 +1,5 @@
 // Geocoding utility with backend integration
-import BunkerAPIClient from './client.js';
+import BunkerAPIClient from './client';
 
 export interface GeocodeResponse {
   lat: number;

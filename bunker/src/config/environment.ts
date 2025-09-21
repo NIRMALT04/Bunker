@@ -10,7 +10,7 @@ export const config = {
   OPEN_METEO_MARINE_URL: 'https://marine-api.open-meteo.com/v1',
   RAINVIEWER_BASE_URL: 'https://api.rainviewer.com/public',
   MAPBOX_BASE_URL: 'https://api.mapbox.com',
-  GEMINI_API_KEY: 
+  GEMINI_API_KEY: 'AIzaSyAXLVK2Y-uPYwP7820CGYp0OxnO_jJZ7GM',
 
   // Application Settings
   APP_NAME: 'Bunker',
