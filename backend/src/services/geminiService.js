@@ -112,7 +112,7 @@ class GeminiService {
    * Build chat prompt for Gemini
    */
   buildChatPrompt(context) {
-    const { userMessage, previousAnalysis, spatialContext } = context;
+    const { userMessage, previousAnalysis, spatialContext, messageCount } = context;
     
     // Validate required parameters
     if (!userMessage || typeof userMessage !== 'string') {
@@ -121,41 +121,153 @@ class GeminiService {
     
     const location = spatialContext?.coordinates ? `${spatialContext.coordinates.lat}, ${spatialContext.coordinates.lng}` : 'Unknown';
     const userMessageLower = userMessage.toLowerCase();
+    const isFirstQuery = !messageCount || messageCount <= 2;
     
-    // Extract key data points only
+    // Extract ALL available data points for comprehensive analysis
     const weatherData = previousAnalysis?.weatherData || {};
+    const marineData = previousAnalysis?.marineData || {};
     const airQualityData = previousAnalysis?.airQualityData || {};
     const healthData = previousAnalysis?.healthData || {};
     const changeDetectionData = previousAnalysis?.changeDetectionData || {};
+    const trafficData = previousAnalysis?.trafficData || {};
+    const pollenData = previousAnalysis?.pollenData || {};
+    const landCoverData = previousAnalysis?.landCoverData || {};
     
-    // Build concise data context
-    const dataContext = `Location: ${location}
-Temp: ${weatherData.current_weather?.temperature || 'N/A'}°C | AQI: ${airQualityData.data?.aqi || 'N/A'} | UV: ${healthData.data?.uvIndex?.index || 'N/A'}
-Land Change: ${changeDetectionData.data?.satelliteAnalysis?.landUseChange || 'N/A'}% | Vegetation: ${changeDetectionData.data?.ndviVegetationAnalysis?.vegetationChange || 'N/A'}%`;
+    // Build data context - comprehensive for first query, concise for follow-ups
+    let dataContext;
+    if (isFirstQuery) {
+      // Comprehensive data for first query
+      dataContext = `📍 COMPREHENSIVE SPATIAL ANALYSIS - Location: ${location}
+🌡️ WEATHER CONDITIONS: ${weatherData.current_weather?.temperature || 'N/A'}°C, Wind Speed: ${weatherData.current_weather?.windspeed || 'N/A'}km/h, Humidity: ${weatherData.hourly?.relativehumidity_2m?.[0] || 'N/A'}%, Precipitation: ${weatherData.hourly?.precipitation?.[0] || 0}mm/h, Pressure: ${weatherData.hourly?.surface_pressure?.[0] || 'N/A'}hPa
+🌊 MARINE CONDITIONS: Wave Height: ${marineData.hourly?.wave_height?.[0] || 'N/A'}m, Sea Temperature: ${marineData.hourly?.sea_temperature?.[0] || 'N/A'}°C, Sea Surface Temperature: ${marineData.hourly?.sea_surface_temperature?.[0] || 'N/A'}°C
+🌬️ AIR QUALITY: AQI: ${airQualityData.data?.aqi || 'N/A'}, Ozone: ${airQualityData.data?.ozone || 'N/A'}μg/m³, PM2.5: ${airQualityData.data?.pm25 || 'N/A'}μg/m³, PM10: ${airQualityData.data?.pm10 || 'N/A'}μg/m³, NO2: ${airQualityData.data?.no2 || 'N/A'}μg/m³
+☀️ HEALTH METRICS: UV Index: ${healthData.data?.uvIndex?.index || 'N/A'}, Pollen Level: ${pollenData.data?.level || 'N/A'}, Pollen Count: ${pollenData.data?.count || 'N/A'}, Allergen Risk: ${pollenData.data?.risk || 'N/A'}
+🚗 TRAFFIC & ACCESSIBILITY: Congestion: ${trafficData.data?.overallCongestion || 0}%, Average Speed: ${trafficData.data?.averageSpeed || 'N/A'}km/h, Road Quality: ${trafficData.data?.roadQuality || 'N/A'}, Accessibility Score: ${trafficData.data?.accessibilityScore || 'N/A'}
+🌱 ENVIRONMENTAL ANALYSIS: Land Use Change: ${changeDetectionData.data?.satelliteAnalysis?.landUseChange || 'N/A'}%, Vegetation Change: ${changeDetectionData.data?.ndviVegetationAnalysis?.vegetationChange || 'N/A'}%, Urban Development: ${changeDetectionData.data?.satelliteAnalysis?.urbanChange || 'N/A'}%, Land Type: ${landCoverData.data?.dominantType || 'N/A'}, Vegetation Coverage: ${landCoverData.data?.vegetationCoverage || 'N/A'}%, Change Intensity: ${changeDetectionData.data?.changeIntensity || 'N/A'}`;
+    } else {
+      // Concise data for follow-up queries
+      dataContext = `Location: ${location} | Temp: ${weatherData.current_weather?.temperature || 'N/A'}°C | UV: ${healthData.data?.uvIndex?.index || 'N/A'} | AQI: ${airQualityData.data?.aqi || 'N/A'} | Wind: ${weatherData.current_weather?.windspeed || 'N/A'}km/h | Wave: ${marineData.hourly?.wave_height?.[0] || 'N/A'}m`;
+    }
     
     // Generate contextual prompt based on user intent
-    if (userMessageLower.includes('stay') || userMessageLower.includes('safe') || userMessageLower.includes('can i')) {
-      return `Safety check for ${location}: ${dataContext}. Question: "${userMessage}". Respond in 1-2 sentences with YES/NO/CAUTION and key risks only.`;
+    if (userMessageLower.includes('stay') || userMessageLower.includes('safe') || userMessageLower.includes('can i') || userMessageLower.includes('dangerous')) {
+      if (isFirstQuery) {
+        return `SAFETY ASSESSMENT for ${location}:
+${dataContext}
+
+QUESTION: "${userMessage}"
+
+REQUIRED ANALYSIS:
+- Use TEMPERATURE and WIND SPEED for weather conditions
+- Use UV INDEX for sun exposure risk
+- Use AQI for air quality impact
+- Use PRECIPITATION for rain/flood risk
+- Use WAVE HEIGHT for marine safety (if applicable)
+- Use TRAFFIC CONGESTION for accessibility
+
+RESPONSE FORMAT: Provide a comprehensive safety assessment with [YES/NO/CAUTION] verdict. Include detailed analysis of all relevant factors with specific data numbers. Explain risks, conditions, and recommendations in 3-4 sentences.`;
+      } else {
+        return `Safety check for ${location}: ${dataContext}. Question: "${userMessage}". Respond in 1-2 sentences with YES/NO/CAUTION and key risks only.`;
+      }
     }
     
     if (userMessageLower.includes('water scarcity') || userMessageLower.includes('water shortage') || userMessageLower.includes('drought')) {
-      return `Water scarcity analysis for ${location}: ${dataContext}. Question: "${userMessage}". Respond in 1-2 sentences with HIGH/MEDIUM/LOW risk and key factors only.`;
+      if (isFirstQuery) {
+        return `WATER SCARCITY ANALYSIS for ${location}:
+${dataContext}
+
+QUESTION: "${userMessage}"
+
+ANALYSIS REQUIREMENTS:
+- Use PRECIPITATION data for water availability
+- Use VEGETATION CHANGE for water stress indicators
+- Use LAND USE CHANGE for water resource impact
+- Use TEMPERATURE for evaporation effects
+- Use HUMIDITY for atmospheric moisture
+
+RESPONSE FORMAT: Provide a comprehensive water scarcity assessment with [HIGH/MEDIUM/LOW] risk level. Include detailed analysis of precipitation patterns, vegetation health, land use changes, and environmental factors. Give specific recommendations in 3-4 sentences.`;
+      } else {
+        return `Water scarcity analysis for ${location}: ${dataContext}. Question: "${userMessage}". Respond in 1-2 sentences with HIGH/MEDIUM/LOW risk and key factors only.`;
+      }
     }
     
     if (userMessageLower.includes('flood') || userMessageLower.includes('flooding')) {
-      return `Flood risk analysis for ${location}: ${dataContext}. Question: "${userMessage}". Respond in 1-2 sentences with HIGH/MEDIUM/LOW risk and key factors only.`;
+      if (isFirstQuery) {
+        return `FLOOD RISK ANALYSIS for ${location}:
+${dataContext}
+
+QUESTION: "${userMessage}"
+
+ANALYSIS REQUIREMENTS:
+- Use PRECIPITATION for rainfall impact
+- Use LAND USE CHANGE for drainage effects
+- Use VEGETATION CHANGE for water absorption
+- Use TEMPERATURE for snowmelt considerations
+- Use ELEVATION and TERRAIN data
+
+RESPONSE FORMAT: Provide a comprehensive flood risk assessment with [HIGH/MEDIUM/LOW] risk level. Include detailed analysis of precipitation patterns, land use changes, vegetation coverage, and terrain factors. Give specific recommendations in 3-4 sentences.`;
+      } else {
+        return `Flood risk analysis for ${location}: ${dataContext}. Question: "${userMessage}". Respond in 1-2 sentences with HIGH/MEDIUM/LOW risk and key factors only.`;
+      }
     }
     
     if (userMessageLower.includes('development') || userMessageLower.includes('change') || userMessageLower.includes('growth') || userMessageLower.includes('future') || userMessageLower.includes('potential')) {
-      return `Development analysis for ${location}: ${dataContext}. Question: "${userMessage}". Respond in 1-2 sentences with HIGH/MEDIUM/LOW potential and key trends only.`;
+      if (isFirstQuery) {
+        return `DEVELOPMENT POTENTIAL ANALYSIS for ${location}:
+${dataContext}
+
+QUESTION: "${userMessage}"
+
+ANALYSIS REQUIREMENTS:
+- Use LAND USE CHANGE for growth trends
+- Use VEGETATION CHANGE for environmental impact
+- Use TRAFFIC CONGESTION for infrastructure capacity
+- Use AIR QUALITY for environmental health
+- Use LAND TYPE for development suitability
+
+RESPONSE FORMAT: Provide a comprehensive development potential assessment with [HIGH/MEDIUM/LOW] potential rating. Include detailed analysis of growth trends, infrastructure capacity, environmental factors, and future projections. Give specific recommendations in 3-4 sentences.`;
+      } else {
+        return `Development analysis for ${location}: ${dataContext}. Question: "${userMessage}". Respond in 1-2 sentences with HIGH/MEDIUM/LOW potential and key trends only.`;
+      }
     }
     
     if (userMessageLower.includes('fishing') || userMessageLower.includes('fish')) {
-      return `Fishing conditions for ${location}: ${dataContext}. Question: "${userMessage}". Respond in 1-2 sentences with EXCELLENT/GOOD/FAIR/POOR rating and key factors only.`;
+      if (isFirstQuery) {
+        return `FISHING SAFETY ANALYSIS for ${location}:
+${dataContext}
+
+QUESTION: "${userMessage}"
+
+REQUIRED ANALYSIS:
+- Use WAVE HEIGHT and SEA TEMPERATURE for marine conditions
+- Use WIND SPEED and PRECIPITATION for weather safety
+- Use UV INDEX for sun exposure risk
+- Use AQI for air quality impact
+- Use TRAFFIC data for beach accessibility
+
+RESPONSE FORMAT: Provide a comprehensive fishing conditions assessment with [EXCELLENT/GOOD/FAIR/POOR] rating. Include detailed analysis of marine conditions, weather factors, safety considerations, and specific recommendations. Use all relevant data points in 3-4 sentences.`;
+      } else {
+        return `Fishing conditions for ${location}: ${dataContext}. Question: "${userMessage}". Respond in 1-2 sentences with EXCELLENT/GOOD/FAIR/POOR rating and key factors only.`;
+      }
     }
     
-    // Default concise response
-    return `Spatial analysis for ${location}: ${dataContext}. Question: "${userMessage}". Respond in 1-2 sentences with key data points and recommendations only.`;
+    // Default response - comprehensive for first query, concise for follow-ups
+    if (isFirstQuery) {
+      return `COMPREHENSIVE SPATIAL ANALYSIS for ${location}:
+${dataContext}
+
+QUESTION: "${userMessage}"
+
+ANALYSIS REQUIREMENTS:
+- Use ALL available data points for comprehensive analysis
+- Include specific numbers and measurements
+- Provide detailed insights and recommendations
+- Reference environmental, weather, and safety factors
+
+RESPONSE FORMAT: Provide a detailed spatial analysis covering all relevant factors. Use specific data numbers, explain conditions, assess risks/opportunities, and give actionable recommendations in 3-4 sentences.`;
+    } else {
+      return `Spatial analysis for ${location}: ${dataContext}. Question: "${userMessage}". Respond in 1-2 sentences with key data points and recommendations only.`;
+    }
   }
 
   /**

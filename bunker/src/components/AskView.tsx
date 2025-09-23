@@ -158,13 +158,7 @@ const AskView: React.FC<AskViewProps> = ({ onAnalyze }) => {
         <div className="mt-12 text-center text-gray-400">
           <p className="mb-4">Try these examples:</p>
           <div className="flex flex-wrap justify-center gap-3">
-            <button 
-              type="button"
-              onClick={() => setQuery("Is it safe to fish at Marina Beach today?")}
-              className="px-4 py-2 bg-black/40 border border-gray-700 rounded-full text-sm hover:border-blue-500 transition"
-            >
-              Is it safe to fish at Marina Beach today?
-            </button>
+            
             <button 
               type="button"
               onClick={() => setQuery("What's the weather like in Mumbai?")}

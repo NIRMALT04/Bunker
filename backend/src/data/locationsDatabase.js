@@ -2,6 +2,18 @@
 // Pre-stored coordinates for accurate location lookup
 
 const LOCATIONS_DATABASE = {
+  // Major States - India
+  "rajasthan": { lat: 27.0238, lng: 74.2179, state: "Rajasthan", type: "state", importance: "major" },
+  "maharashtra": { lat: 19.7515, lng: 75.7139, state: "Maharashtra", type: "state", importance: "major" },
+  "karnataka": { lat: 15.3173, lng: 75.7139, state: "Karnataka", type: "state", importance: "major" },
+  "tamil nadu": { lat: 11.1271, lng: 78.6569, state: "Tamil Nadu", type: "state", importance: "major" },
+  "kerala": { lat: 10.8505, lng: 76.2711, state: "Kerala", type: "state", importance: "major" },
+  "west bengal": { lat: 22.9868, lng: 87.8550, state: "West Bengal", type: "state", importance: "major" },
+  "gujarat": { lat: 23.0225, lng: 72.5714, state: "Gujarat", type: "state", importance: "major" },
+  "punjab": { lat: 31.1471, lng: 75.3412, state: "Punjab", type: "state", importance: "major" },
+  "haryana": { lat: 29.0588, lng: 76.0856, state: "Haryana", type: "state", importance: "major" },
+  "delhi": { lat: 28.7041, lng: 77.1025, state: "Delhi", type: "union territory", importance: "major" },
+
   // Major Cities - Tamil Nadu
   "chennai": { lat: 13.0827, lng: 80.2707, state: "Tamil Nadu", type: "city", importance: "major" },
   "madurai": { lat: 9.9252, lng: 78.1198, state: "Tamil Nadu", type: "city", importance: "major" },

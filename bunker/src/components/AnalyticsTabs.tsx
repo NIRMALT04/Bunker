@@ -257,6 +257,7 @@ const SatelliteDataTab: React.FC<{
     setImageErrors(prev => ({ ...prev, [imageKey]: true }));
   };
 
+
   const SatelliteImageView: React.FC<{
     src: string;
     alt: string;

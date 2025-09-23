@@ -73,6 +73,11 @@ class GeocodeService {
         return {
           lat: dbResult.lat,
           lng: dbResult.lng,
+          coordinates: {
+            lat: dbResult.lat,
+            lng: dbResult.lng
+          },
+          location: dbResult.name,
           name: dbResult.name,
           confidence: 1.0, // Database results are 100% accurate
           address: `${dbResult.name}, ${dbResult.state}, India`,
@@ -131,6 +136,11 @@ class GeocodeService {
       const coordinates = {
         lat: parseFloat(bestResult.lat),
         lng: parseFloat(bestResult.lon),
+        coordinates: {
+          lat: parseFloat(bestResult.lat),
+          lng: parseFloat(bestResult.lon)
+        },
+        location: bestResult.display_name,
         name: bestResult.display_name,
         confidence: bestResult.confidence,
         address: bestResult.address,
